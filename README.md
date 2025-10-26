@@ -45,7 +45,7 @@ The **tutorial page** provides a step-by-step guide on how to use the applicatio
 
 Here is some example generated Steam wrap images:
 <div>
-<img src="./images/test_red.png" alt="Example Wrap 1" width="300"/>
-<img src="./images/test_purple.png" alt="Example Wrap 2" width="300"/>
-<img src="./images/test_green.png" alt="Example Wrap 3" width="300"/>
+<img src="./images/test_red.png" alt="Example Wrap 1" width="200"/>
+<img src="./images/test_purple.png" alt="Example Wrap 2" width="200"/>
+<img src="./images/test_green.png" alt="Example Wrap 3" width="200"/>
 </div>
