@@ -1,0 +1,24 @@
+/* Global app background matching Ant Design dark theme */
+:root {
+  /* fallback colors if Ant tokens aren't available */
+  --app-bg: #0f1720; /* very dark slate */
+  --app-text: rgba(255, 255, 255, 0.88);
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--app-bg);
+  color: var(--app-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure Ant components that rely on body background sit correctly */
+.ant-layout {
+  min-height: 100%;
+  background: transparent;
+}
