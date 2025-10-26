@@ -15,6 +15,12 @@ export default defineConfig(() => {
           secure: steamProxyTarget.startsWith('https'),
           rewrite: (path) => path.replace(/^\/steam-api/, ''),
         },
+        // Proxy /api/proxy to the local node proxy (if you run `npm run start:proxy`)
+        '/api/proxy': {
+          target: 'http://localhost:3001',
+          changeOrigin: true,
+          secure: false,
+        },
       },
     },
   };
