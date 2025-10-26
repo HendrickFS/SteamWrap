@@ -135,7 +135,7 @@ function clipRoundRect(
 
 export default async function generateReportImage(
   report: Report,
-  options?: { preset?: "social" | "phone"; width?: number; height?: number }
+  options?: { preset?: "social" | "phone"; width?: number; height?: number; gradientColors?: string[] }
 ): Promise<string> {
   // Set width and compute a dynamic height so all games fit on the image
   const width = options?.width ?? 600;
@@ -176,18 +176,18 @@ export default async function generateReportImage(
   canvas.height = height;
   const ctx = canvas.getContext("2d")!; // --- STYLING CONSTANTS ---
 
-  const mainColor = "#FFFFFF";
-  const lightColor = "rgba(255, 255, 255, 0.6)";
-  const barFillColor = "#3e90ff"; // Bright blue
-  const barBackgroundColor = "rgba(0, 0, 0, 0.1)";
-  const backgroundColor = "#7200a7ff"; // Dark background // --- 1. Background ---
+  const mainColor = '#FFFFFF';
+  const lightColor = 'rgba(255, 255, 255, 0.6)';
+  const barFillColor = '#3e90ff'; // Bright blue
+  const barBackgroundColor = 'rgba(255, 255, 255, 0.1)';
+  const backgroundColor = '#1f2025'; // dark fallback
 
-  // Gradient background (vertical) for a more professional look
+  // Gradient background (vertical). Accept colors from options.gradientColors (array of 3), otherwise use sensible defaults.
+  const bgColors = options?.gradientColors ?? ['#1b0096ff', '#000e3aff', '#000000ff'];
   const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
-  // Dark base -> subtle mid tone -> backgroundColor at the bottom
-  bgGrad.addColorStop(0, '#7200a7ff');
-  bgGrad.addColorStop(0.5, '#001691ff');
-  bgGrad.addColorStop(1, backgroundColor);
+  bgGrad.addColorStop(0, bgColors[0]);
+  bgGrad.addColorStop(0.5, bgColors[1] ?? bgColors[0]);
+  bgGrad.addColorStop(1, bgColors[2] ?? bgColors[1] ?? bgColors[0]);
   ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, width, height);
   let currentY = 20;

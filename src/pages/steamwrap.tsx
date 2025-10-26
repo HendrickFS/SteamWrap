@@ -47,6 +47,7 @@ export default function SteamWrapPage() {
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState<Report | null>(null);
   const [generatingImage, setGeneratingImage] = useState(false);
+  const [gradientColors, setGradientColors] = useState<string[]>(['#1b0096ff', '#000e3aff', '#000000ff']);
 
   const onFinish = async (values: { steamId: string; period?: Period }) => {
     if (!values.steamId?.trim()) {
@@ -106,7 +107,7 @@ export default function SteamWrapPage() {
       };
 
       // Generate image client-side (no server proxy required)
-      const dataUrl = await generateReportImage(normalizedReport, { preset: 'phone' });
+  const dataUrl = await generateReportImage(normalizedReport, { preset: 'phone', gradientColors });
       if (!dataUrl) throw new Error('Image generation returned empty');
       const a = document.createElement('a');
       a.href = dataUrl;
@@ -137,6 +138,7 @@ export default function SteamWrapPage() {
                 <Form.Item name="steamId" label={<Text>Steam ID</Text>} rules={[{ required: true, message: "Please input your Steam ID" }]}>
                   <Input prefix={<UserOutlined />} placeholder="e.g. 76561198000000000" />
                 </Form.Item>
+                
                 <Form.Item>
                   <Space>
                     <Button type="primary" htmlType="submit" icon={<FireOutlined />}>Generate</Button>
@@ -159,10 +161,19 @@ export default function SteamWrapPage() {
 
             {!loading && report && (
               <div>
-                <div style={{ display: "flex", flexDirection: "row", alignItems: "center", marginBottom: 24, alignContent: "center", justifyContent: "center", gap: 16 }}>
+                <div style={{ display: "flex", flexDirection: "row", alignItems: "center", marginBottom: 12, alignContent: "center", justifyContent: "center", gap: 16 }}>
                   <Avatar size={80} shape="square" src={report.steamAvatar || undefined} icon={<UserOutlined />} style={{ marginBottom: 16 }} />
                   <h1>{report.steamName}</h1>
                 </div>
+
+                {/* Gradient selectors placed after data is fetched so users can preview before export */}
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 12 }}>
+                  <label style={{ color: 'rgba(255,255,255,0.8)', marginRight: 8, alignSelf: 'center' }}>Gradient:</label>
+                  <input type="color" value={gradientColors[0]} onChange={e => setGradientColors(s => { const c = [...s]; c[0] = e.target.value; return c; })} />
+                  <input type="color" value={gradientColors[1]} onChange={e => setGradientColors(s => { const c = [...s]; c[1] = e.target.value; return c; })} />
+                  <input type="color" value={gradientColors[2]} onChange={e => setGradientColors(s => { const c = [...s]; c[2] = e.target.value; return c; })} />
+                </div>
+
                 <Button type="primary" icon={<DownloadOutlined />} loading={generatingImage} onClick={onExportImage}>Export Report Image</Button>
                 <div style={{ height: 30 }} />
                 <Title level={4}>Steam 14 Days Report</Title>
