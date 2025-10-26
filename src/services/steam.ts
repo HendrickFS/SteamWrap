@@ -1,12 +1,20 @@
 const API_KEY = (import.meta as any).env?.VITE_STEAM_API_KEY || (import.meta as any).env?.STEAM_API_KEY;
 const isDev = Boolean((import.meta as any).env?.DEV);
+// Optional backend host if your backend lives on a different domain in production
+const BACKEND_URL = (import.meta as any).env?.VITE_BACKEND_URL || (import.meta as any).env?.BACKEND_URL || '';
 
 function buildUrl(path: string, params: Record<string, string | number | boolean>) {
   const qp = new URLSearchParams();
   Object.entries(params).forEach(([k, v]) => qp.set(k, String(v)));
-  // In dev we route to the dev proxy so the browser doesn't hit Steam directly (avoids CORS)
+
+  // During development, route to the Vite proxy path used in the project (vite.config.ts proxies /steam-api)
+  // This keeps the previous behavior and avoids breaking dev when Vite is proxying /steam-api -> Steam or a local proxy.
   if (isDev) return `/steam-api${path}?${qp.toString()}`;
-  return `https://api.steampowered.com${path}?${qp.toString()}`;
+
+  // In production, prefer an explicit backend host if provided (e.g. https://api.example.com),
+  // otherwise call the same-origin `/steam` path so the server-side proxy can append the key.
+  if (BACKEND_URL) return `${BACKEND_URL.replace(/\/$/, '')}/steam${path}?${qp.toString()}`;
+  return `/steam${path}?${qp.toString()}`;
 }
 
 async function fetchJson(url: string) {
@@ -17,8 +25,11 @@ async function fetchJson(url: string) {
 
 async function apiGet(path: string, params: Record<string, string | number | boolean>) {
   const p = { ...params };
+
+  // If a client-side key is provided (VITE_STEAM_API_KEY) use it (useful for local dev).
+  // In production we expect the server proxy to append the key, so do not require a client key.
   if (API_KEY) p.key = API_KEY;
-  else if (!isDev) throw new Error('STEAM API key not found. Set VITE_STEAM_API_KEY in your .env');
+  else if (isDev) throw new Error('STEAM API key not found. Set VITE_STEAM_API_KEY in your .env for local development');
 
   const url = buildUrl(path, p);
   return fetchJson(url);

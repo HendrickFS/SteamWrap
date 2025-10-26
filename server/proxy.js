@@ -172,7 +172,8 @@ app.post('/api/generate-image', async (req, res) => {
 
 // Optional Steam API proxy that appends the server-side key (if provided in .env as STEAM_API_KEY).
 // Usage: GET /steam/<path>?<query>
-const STEAM_API_KEY = process.env.VITE_STEAM_API_KEY;
+// Use a non-VITE env var here so the key is never accidentally exposed to the frontend build.
+const STEAM_API_KEY = process.env.STEAM_API_KEY;
 if (STEAM_API_KEY) {
   app.use('/steam/*', async (req, res) => {
     try {
