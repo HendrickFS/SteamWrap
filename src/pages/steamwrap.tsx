@@ -14,6 +14,7 @@ import {
   Avatar,
 } from 'antd';
 import { UserOutlined, FireOutlined, ReloadOutlined, DownloadOutlined } from '@ant-design/icons';
+import Footer from '../components/Footer';
 
 const { Title, Paragraph, Text } = Typography;
 import { generateReport as fetchSteamReport } from "../services/steam";
@@ -58,13 +59,29 @@ export default function SteamWrapPage() {
 
     setLoading(true);
     setReport(null);
+    // Local helper to validate the report shape returned by the API
+    const isValidReport = (r: any) => {
+      if (!r || typeof r !== 'object') return false;
+      // Accept if we have either a numeric totalHours or a non-empty topGames array
+      if (typeof r.totalHours === 'number') return true;
+      if (Array.isArray(r.topGames) && r.topGames.length > 0) return true;
+      return false;
+    };
+
     try {
       const rpt = await fetchSteamReport(values.steamId.trim(), period);
-      setReport(rpt as any);
-      message.success("Report generated");
+      if (!isValidReport(rpt)) {
+        console.error('Steam API returned unexpected data', rpt);
+        message.error('Steam returned invalid or incomplete data. Please try again or check the Steam ID.');
+        setReport(null);
+      } else {
+        setReport(rpt as any);
+        message.success('Report generated');
+      }
     } catch (err: any) {
-      console.error("Steam API error", err);
-      message.error(err?.message || "Failed to fetch Steam report");
+      console.error('Steam API error', err);
+      message.error(err?.message || 'Failed to fetch Steam report');
+      setReport(null);
     } finally {
       setLoading(false);
     }
@@ -126,7 +143,7 @@ export default function SteamWrapPage() {
   };
 
   return (
-    <div style={{ display: "flex", justifyContent: "center" }}>
+    <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-start", padding: 24, minHeight: '100vh' }}>
       <Card style={{ width: "100%", maxWidth: 760, borderRadius: 12 }} bodyStyle={{ padding: 24 }}>
         <div style={{ textAlign: "center", maxWidth: 640, margin: "0 auto" }}>
           <Title style={{ marginBottom: 8 }} level={3}>SteamWrap</Title>

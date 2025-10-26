@@ -5,6 +5,7 @@ import HomePage from './pages/home';
 import SteamWrapPage from './pages/steamwrap';
 import TutorialPage from './pages/tutorial';
 import { Gamepad } from 'lucide-react';
+import AppFooter from './components/Footer';
 
 const { Header, Content } = Layout;
 
@@ -31,6 +32,8 @@ function App() {
         <Content style={{ padding: 24 }}>
           {page === 'home' ? <HomePage onNavigate={setPage} /> : page === 'steamwrap' ? <SteamWrapPage /> : page === 'tutorial' ? <TutorialPage /> : null}
         </Content>
+        {/* Global footer rendered at the app level */}
+        <AppFooter />
       </Layout>
     </ConfigProvider>
   );
